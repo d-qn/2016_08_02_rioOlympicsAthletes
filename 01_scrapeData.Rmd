@@ -1,0 +1,72 @@
+---
+title: "01_scrape athletes olympics"
+author: "Duc-Quang Nguyen"
+date: "2 Aug 2016"
+output: html_document
+---
+
+
+```{r setup, include=FALSE}
+library(readr)
+library(tidyr)
+library(dplyr)
+library(magrittr)
+library(countrycode)
+### Getting data in packages
+library(rvest)
+
+
+# hack for some IOC country abbrevations 
+
+ioc_country <- structure(
+  c("ROT", "KOS", "IVB", "SSD", "IOA"), 
+  names = c("Refugee Olympic Team", "Kosovo", "British Virgin Islands", "South Sudan", "Individual Olympic Athletes")
+)
+
+```
+
+
+```{r scrape}
+base.url <- "https://www.rio2016.com/en/"
+
+# Get all the sports and their URLs
+sports <- read_html("https://www.rio2016.com/en/sports") %>% 
+  html_nodes(".olympic-pictograms__item") %>% html_nodes("a")
+
+sports.suffix <- gsub('<a href="/en/(.*)" class.*', "\\1", sports)
+
+
+athletes.list <- lapply(sports.suffix, function(sport) {
+  cat("\n", sport)
+  sport.url <- paste0(base.url, sport)
+  
+  name <- read_html(sport.url) %>%
+    html_nodes(".athletes-teams-graphic__full-list-name") %>% html_text()
+  gender <- read_html(sport.url) %>%
+    html_nodes(".athletes-teams-graphic__full-list-gender") %>% html_text()
+  iso3c <- read_html(sport.url) %>%
+    html_nodes(".athletes-teams-graphic__full-list-country")  %>% html_text()
+  stopifnot(length(name) == length(iso3c), length(gender) == length(name))
+  
+  if(length(name) == 0) {
+    warning("\n\n", "No althletes list for ", sport, "!!!", "\n")
+    NULL
+  } else {
+    data.frame(athletes = name, gender = gender, iso3 = iso3c, sport =  sport, stringsAsFactors = F)     
+  }
+})
+
+athletes <- do.call(rbind, athletes.list)
+athletes$country <- countrycode(athletes$iso3, "ioc", "country.name")
+
+# Unmatched IOC nation abbrevations
+idx <- match(athletes[which(is.na(athletes$country)),'iso3'], ioc_country)
+if(any(is.na(idx))) {
+  warning("\nSome country IOC abbrevations have no English name!\n")
+}
+athletes[which(is.na(athletes$country)),'country'] <- names(ioc_country)[idx]
+
+
+write.csv(athletes, "input/athletes_rio2016.csv", row.names = F)
+```
+

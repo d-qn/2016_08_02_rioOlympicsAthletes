@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<script src="js/htmlwidgets-0.6/htmlwidgets.js"></script>
+<script src="js/jquery-1.11.1/jquery.min.js"></script>
+<script src="js/underscore-1.8.3/underscore-min.js"></script>
+<link href="js/highcharts-4.2.4/css/motion.css" rel="stylesheet" />
+<script src="js/highcharts-4.2.4/highstock.js"></script>
+<script src="js/highcharts-4.2.4/highcharts-more.js"></script>
+<script src="js/highcharts-4.2.4/highcharts-3d.js"></script>
+<script src="js/highcharts-4.2.4/modules/exporting.js"></script>
+<script src="js/highcharts-4.2.4/modules/drilldown.js"></script>
+<script src="js/highcharts-4.2.4/modules/data.js"></script>
+<script src="js/highcharts-4.2.4/modules/heatmap.js"></script>
+<script src="js/highcharts-4.2.4/modules/map.js"></script>
+<script src="js/highcharts-4.2.4/modules/treemap.js"></script>
+<script src="js/highcharts-4.2.4/modules/funnel.js"></script>
+<script src="js/highcharts-4.2.4/modules/solid-gauge.js"></script>
+<script src="js/highcharts-4.2.4/modules/reset.js"></script>
+<script src="js/highcharts-4.2.4/plugins/motion.js"></script>
+<script src="js/highcharts-4.2.4/plugins/draggable-points.js"></script>
+<script src="js/highcharts-4.2.4/plugins/pattern-fill-v2.js"></script>
+<script src="js/highcharts-4.2.4/plugins/text-symbols.js"></script>
+<link href="js/fontawesome-4.5.0/font-awesome.min.css" rel="stylesheet" />
+<link href="js/htmlwdgtgrid-1/htmlwdgtgrid.css" rel="stylesheet" />
+<script src="js/highchart-binding-0.3.1.9999/highchart.js"></script>
+  <link href='https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300,700&subset=latin,cyrillic' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700,800,400italic&subset=latin,cyrillic' rel='stylesheet' type='text/css'>
+
+<style>
+/*  #######   header and footer styling   ########*/
+
+body, h1, h2, h3, h4, h5, h6, .descr {
+   text-rendering: optimizeLegibility;
+   font-smoothing: antialiased;
+   font-family: 'Open Sans', sans-serif;
+   font-size: 12px;
+   margin:4px 4px 4px 5px;
+}
+
+/* ensure data labels are not visible over the tooltip:
+http://stackoverflow.com/questions/15130311/highcharts-labels-visible-over-tooltip */
+/*label {
+  z-index: 1 !important;
+}
+
+.highcharts-tooltip span {
+  background-color:white;
+  opacity:1;
+  z-index:9999 !important;
+  border-radius: 3px;
+
+}
+
+.tooltip {
+  padding:2px;
+}
+*/
+
+
+#cite {
+    font-size: 0.9em; color: #737373; text-align: right; margin-top:2px; margin-right:10px; padding-bottom: 3px;
+}
+#cite a { text-decoration: none; color: #821122; }
+
+.descr {
+ font-size: 1.2em;
+ color: #9b4b4c;
+}
+    
+h1 {
+   font-size:2em;
+}
+
+h2 {
+   font-size:2.4em;
+   font-weight: lighter;
+   line-height: 95%;
+}
+
+h3 {
+   font-size:1.2em
+}
+
+h4 {
+   font-size:1.1em;
+}
+
+h5 {
+   font-size:0.9em;
+}
+
+h6 {
+   font-size:0.8em;
+}
+
+
+a:visited {
+   color: rgb(50%, 0%, 50%);
+}
+
+
+body {
+      font-size:8pt;
+      max-width:100%;
+   }
+
+   a, a:visited {
+      text-decoration: underline;
+   }
+}
+
+</style>
+</head>
+<body style="background-color:#f2f2f2;">
+<html>
+  <body>
+    <div class="graphic">
+      <div id="htmlwidget-1009" style="width:100%;height:580px;" class="highchart html-widget"></div>
+      <script type="application/json" data-for="htmlwidget-1009">{"x":{"hc_opts":{"title":{"text":null},"yAxis":{"title":{"text":null},"type":"logarithmic","floor":0,"maxPadding":0.08,"labels":{"formatter":"function() {return this.value;}"},"reversed":false},"credits":{"enabled":false},"exporting":{"enabled":false},"plotOptions":{"series":{"turboThreshold":0},"bubble":{"maxSize":"12%","minSize":8,"dataLabels":{"enabled":true,"format":"{series.name}","style":{"textShadow":false,"fontSize":"0.7em","fontWeight":"normal"}}}},"chart":{"type":"bubble","spacing":[13,2,2,0]},"series":[{"data":[{"x":643166.288737192,"y":13,"z":9156963,"color":"#ab3d3f","name":"United Arab Emirates"}],"name":"AE"},{"data":[{"x":62912.6691669976,"y":3,"z":32526562,"color":"#ab3d3f","name":"Afghanistan"}],"name":"AF"},{"data":[{"x":2108.84754428299,"y":9,"z":91818,"color":"#666633","name":"Antigua and Barbuda"}],"name":"AG"},{"data":[{"x":32663.2389364532,"y":6,"z":2889167,"color":"#333366","name":"Albania"}],"name":"AL"},{"data":[{"x":25329.2012381707,"y":32,"z":3017712,"color":"#ab3d3f","name":"Armenia"}],"name":"AM"},{"data":[{"x":184437.662367835,"y":26,"z":25021974,"color":"#663333","name":"Angola"}],"name":"AO"},{"data":[{"x":411818.289486055,"y":65,"z":8611088,"color":"#333366","name":"Austria"}],"name":"AT"},{"data":[{"x":1082380.30730341,"y":409,"z":23781169,"color":"#ac7f3e","name":"Australia"}],"name":"AU"},{"data":[{"x":3671.23222236581,"y":7,"z":103889,"color":"#666633","name":"Aruba"}],"name":"AW"},{"data":[{"x":171214.494401936,"y":56,"z":9651349,"color":"#ab3d3f","name":"Azerbaijan"}],"name":"AZ"},{"data":[{"x":40046.1439252136,"y":11,"z":3810416,"color":"#333366","name":"Bosnia and Herzegovina"}],"name":"BA"},{"data":[{"x":4658.52967405079,"y":12,"z":284215,"color":"#666633","name":"Barbados"}],"name":"BB"},{"data":[{"x":536566.830314944,"y":6,"z":160995642,"color":"#ab3d3f","name":"Bangladesh"}],"name":"BD"},{"data":[{"x":496477.182327946,"y":104,"z":11285721,"color":"#333366","name":"Belgium"}],"name":"BE"},{"data":[{"x":30041.1282460502,"y":5,"z":18105570,"color":"#663333","name":"Burkina Faso"}],"name":"BF"},{"data":[{"x":125699.285209393,"y":51,"z":7177991,"color":"#333366","name":"Bulgaria"}],"name":"BG"},{"data":[{"x":64656.2298370043,"y":36,"z":1377237,"color":"#ab3d3f","name":"Bahrain"}],"name":"BH"},{"data":[{"x":8227.81814603493,"y":9,"z":11178921,"color":"#663333","name":"Burundi"}],"name":"BI"},{"data":[{"x":22954.7632325558,"y":6,"z":10879829,"color":"#663333","name":"Benin"}],"name":"BJ"},{"data":[{"x":3408.90215179275,"y":8,"z":65235,"color":"#666633","name":"Bermuda"}],"name":"BM"},{"data":[{"x":29968.9124291198,"y":3,"z":423188,"color":"#ab3d3f","name":"Brunei Darussalam"}],"name":"BN"},{"data":[{"x":3192398.00250933,"y":469,"z":207847528,"color":"#666633","name":"Brazil"}],"name":"BR"},{"data":[{"x":6258.26849614096,"y":2,"z":774830,"color":"#ab3d3f","name":"Bhutan"}],"name":"BT"},{"data":[{"x":35763.2943348246,"y":12,"z":2262485,"color":"#663333","name":"Botswana"}],"name":"BW"},{"data":[{"x":168008.584869938,"y":123,"z":9513000,"color":"#333366","name":"Belarus"}],"name":"BY"},{"data":[{"x":3063.6142046366,"y":3,"z":359287,"color":"#666633","name":"Belize"}],"name":"BZ"},{"data":[{"x":1588596.44696276,"y":308,"z":35851774,"color":"#666633","name":"Canada"}],"name":"CA"},{"data":[{"x":2927.26291089251,"y":6,"z":4900274,"color":"#663333","name":"Central African Republic"}],"name":"CF"},{"data":[{"x":501653.407776545,"y":102,"z":8286976,"color":"#333366","name":"Switzerland"}],"name":"CH"},{"data":[{"x":79360.774755889,"y":12,"z":22701556,"color":"#663333","name":"Cote d'Ivoire"}],"name":"CI"},{"data":[{"x":400534.442322336,"y":41,"z":17948141,"color":"#666633","name":"Chile"}],"name":"CL"},{"data":[{"x":72895.5596651794,"y":24,"z":23344179,"color":"#663333","name":"Cameroon"}],"name":"CM"},{"data":[{"x":19524348.1714153,"y":396,"z":1371220000,"color":"#ab3d3f","name":"China"}],"name":"CN"},{"data":[{"x":665594.053124526,"y":152,"z":48228704,"color":"#666633","name":"Colombia"}],"name":"CO"},{"data":[{"x":73931.4131828175,"y":10,"z":4807850,"color":"#666633","name":"Costa Rica"}],"name":"CR"},{"data":[{"x":234624.069248881,"y":118,"z":11389562,"color":"#666633","name":"Cuba"}],"name":"CU"},{"data":[{"x":3482.06020832357,"y":5,"z":520502,"color":"#663333","name":"Cabo Verde"}],"name":"CV"},{"data":[{"x":25864.2529338819,"y":16,"z":1165300,"color":"#ab3d3f","name":"Cyprus"}],"name":"CY"},{"data":[{"x":339401.671826762,"y":102,"z":10551219,"color":"#333366","name":"Czech Republic"}],"name":"CZ"},{"data":[{"x":3848271.84500592,"y":427,"z":81413145,"color":"#333366","name":"Germany"}],"name":"DE"},{"data":[{"x":2875.91870138971,"y":7,"z":887861,"color":"#663333","name":"Djibouti"}],"name":"DJ"},{"data":[{"x":264701.742375408,"y":115,"z":5676002,"color":"#333366","name":"Denmark"}],"name":"DK"},{"data":[{"x":819.679822765069,"y":2,"z":72680,"color":"#666633","name":"Dominica"}],"name":"DM"},{"data":[{"x":149626.592866045,"y":29,"z":10528391,"color":"#666633","name":"Dominican Republic"}],"name":"DO"},{"data":[{"x":582597.642740492,"y":68,"z":39666519,"color":"#663333","name":"Algeria"}],"name":"DZ"},{"data":[{"x":183854.538951818,"y":37,"z":16144363,"color":"#666633","name":"Ecuador"}],"name":"EC"},{"data":[{"x":36860.3279090171,"y":43,"z":1311998,"color":"#333366","name":"Estonia"}],"name":"EE"},{"data":[{"x":6758.83546549469,"y":12,"z":4789568,"color":"#663333","name":"Eritrea"}],"name":"ER"},{"data":[{"x":1602660.45281654,"y":297,"z":46418269,"color":"#333366","name":"Spain"}],"name":"ES"},{"data":[{"x":161570.921285025,"y":38,"z":99390750,"color":"#663333","name":"Ethiopia"}],"name":"ET"},{"data":[{"x":222574.765336252,"y":49,"z":5482013,"color":"#333366","name":"Finland"}],"name":"FI"},{"data":[{"x":8171.14462473362,"y":52,"z":892145,"color":"#ac7f3e","name":"Fiji"}],"name":"FJ"},{"data":[{"x":2650822.57367473,"y":392,"z":66808385,"color":"#333366","name":"France"}],"name":"FR"},{"data":[{"x":34523.3340381309,"y":6,"z":1725292,"color":"#663333","name":"Gabon"}],"name":"GA"},{"data":[{"x":2691808.53720682,"y":366,"z":65138232,"color":"#333366","name":"United Kingdom"}],"name":"GB"},{"data":[{"x":1385.19393922406,"y":6,"z":106825,"color":"#666633","name":"Grenada"}],"name":"GD"},{"data":[{"x":35609.7312191178,"y":39,"z":3679000,"color":"#ab3d3f","name":"Georgia"}],"name":"GE"},{"data":[{"x":115136.546615921,"y":14,"z":27409893,"color":"#663333","name":"Ghana"}],"name":"GH"},{"data":[{"x":15212.6358988032,"y":5,"z":12608590,"color":"#663333","name":"Guinea"}],"name":"GN"},{"data":[{"x":25386.1525920172,"y":2,"z":845060,"color":"#663333","name":"Equatorial Guinea"}],"name":"GQ"},{"data":[{"x":288778.094736549,"y":94,"z":10823732,"color":"#333366","name":"Greece"}],"name":"GR"},{"data":[{"x":125950.437098481,"y":21,"z":16342897,"color":"#666633","name":"Guatemala"}],"name":"GT"},{"data":[{"x":2679.51919828642,"y":5,"z":1844325,"color":"#663333","name":"Guinea-Bissau"}],"name":"GW"},{"data":[{"x":5758.08141804588,"y":6,"z":767085,"color":"#666633","name":"Guyana"}],"name":"GY"},{"data":[{"x":41057.4040589744,"y":30,"z":8075060,"color":"#666633","name":"Honduras"}],"name":"HN"},{"data":[{"x":92432.0050336067,"y":88,"z":4224404,"color":"#333366","name":"Croatia"}],"name":"HR"},{"data":[{"x":18874.7599248154,"y":10,"z":10711067,"color":"#666633","name":"Haiti"}],"name":"HT"},{"data":[{"x":251841.869478761,"y":152,"z":9844686,"color":"#333366","name":"Hungary"}],"name":"HU"},{"data":[{"x":2842240.50877661,"y":28,"z":257563815,"color":"#ab3d3f","name":"Indonesia"}],"name":"ID"},{"data":[{"x":253634.826262218,"y":75,"z":4640703,"color":"#333366","name":"Ireland"}],"name":"IE"},{"data":[{"x":296931.055836516,"y":46,"z":8380400,"color":"#ab3d3f","name":"Israel"}],"name":"IL"},{"data":[{"x":7982527.56832837,"y":121,"z":1311050527,"color":"#ab3d3f","name":"India"}],"name":"IN"},{"data":[{"x":542519.589882947,"y":26,"z":36423395,"color":"#ab3d3f","name":"Iraq"}],"name":"IQ"},{"data":[{"x":15398.8106164064,"y":8,"z":330823,"color":"#333366","name":"Iceland"}],"name":"IS"},{"data":[{"x":2182579.69954998,"y":288,"z":60802085,"color":"#333366","name":"Italy"}],"name":"IT"},{"data":[{"x":24703.884112125,"y":59,"z":2725941,"color":"#666633","name":"Jamaica"}],"name":"JM"},{"data":[{"x":82631.1022150463,"y":8,"z":7594547,"color":"#ab3d3f","name":"Jordan"}],"name":"JO"},{"data":[{"x":4738293.56088174,"y":334,"z":126958472,"color":"#ab3d3f","name":"Japan"}],"name":"JP"},{"data":[{"x":141950.884422676,"y":80,"z":46050302,"color":"#663333","name":"Kenya"}],"name":"KE"},{"data":[{"x":54262.9117222098,"y":6,"z":15577899,"color":"#ab3d3f","name":"Cambodia"}],"name":"KH"},{"data":[{"x":208.954488326819,"y":3,"z":112423,"color":"#ac7f3e","name":"Kiribati"}],"name":"KI"},{"data":[{"x":1104.55249302062,"y":4,"z":788474,"color":"#663333","name":"Comoros"}],"name":"KM"},{"data":[{"x":2823.46345174062,"y":5,"z":59967,"color":"#666633","name":"Cayman Islands"}],"name":"KY"},{"data":[{"x":453980.728694251,"y":103,"z":17544126,"color":"#ab3d3f","name":"Kazakhstan"}],"name":"KZ"},{"data":[{"x":81547.3392072225,"y":9,"z":5850743,"color":"#ab3d3f","name":"Lebanon"}],"name":"LB"},{"data":[{"x":246117.28153307,"y":9,"z":20966000,"color":"#ab3d3f","name":"Sri Lanka"}],"name":"LK"},{"data":[{"x":3765.55419365696,"y":2,"z":4503438,"color":"#663333","name":"Liberia"}],"name":"LR"},{"data":[{"x":5585.05688989656,"y":8,"z":2135022,"color":"#663333","name":"Lesotho"}],"name":"LS"},{"data":[{"x":80699.0936937234,"y":66,"z":2910199,"color":"#333366","name":"Lithuania"}],"name":"LT"},{"data":[{"x":58065.0372986735,"y":10,"z":569676,"color":"#333366","name":"Luxembourg"}],"name":"LU"},{"data":[{"x":48048.6885564292,"y":33,"z":1978440,"color":"#333366","name":"Latvia"}],"name":"LV"},{"data":[{"x":88866.6328946263,"y":7,"z":6278438,"color":"#663333","name":"Libya"}],"name":"LY"},{"data":[{"x":273358.206500342,"y":48,"z":34377511,"color":"#663333","name":"Morocco"}],"name":"MA"},{"data":[{"x":9638.17988174372,"y":35,"z":622388,"color":"#333366","name":"Montenegro"}],"name":"ME"},{"data":[{"x":35365.9483560519,"y":6,"z":24235390,"color":"#663333","name":"Madagascar"}],"name":"MG"},{"data":[{"x":201.8894330225,"y":5,"z":52993,"color":"#ac7f3e","name":"Marshall Islands"}],"name":"MH"},{"data":[{"x":42737.16030868,"y":6,"z":17599694,"color":"#663333","name":"Mali"}],"name":"ML"},{"data":[{"x":36067.6846208173,"y":43,"z":2959134,"color":"#ab3d3f","name":"Mongolia"}],"name":"MN"},{"data":[{"x":15424.7455228428,"y":2,"z":4067564,"color":"#663333","name":"Mauritania"}],"name":"MR"},{"data":[{"x":12500.4163317362,"y":7,"z":431333,"color":"#333366","name":"Malta"}],"name":"MT"},{"data":[{"x":24596.1397153917,"y":12,"z":1262605,"color":"#663333","name":"Mauritius"}],"name":"MU"},{"data":[{"x":5170.3978754926,"y":4,"z":409163,"color":"#ab3d3f","name":"Maldives"}],"name":"MV"},{"data":[{"x":20359.1219225024,"y":5,"z":17215232,"color":"#663333","name":"Malawi"}],"name":"MW"},{"data":[{"x":2194431.31364783,"y":124,"z":127017224,"color":"#666633","name":"Mexico"}],"name":"MX"},{"data":[{"x":815644.552976793,"y":28,"z":30331007,"color":"#ab3d3f","name":"Malaysia"}],"name":"MY"},{"data":[{"x":33176.5979324473,"y":6,"z":27977863,"color":"#663333","name":"Mozambique"}],"name":"MZ"},{"data":[{"x":25606.1977678651,"y":9,"z":2458830,"color":"#663333","name":"Namibia"}],"name":"NA"},{"data":[{"x":18974.6435195049,"y":6,"z":19899120,"color":"#663333","name":"Niger"}],"name":"NE"},{"data":[{"x":1091697.77206692,"y":81,"z":182201962,"color":"#663333","name":"Nigeria"}],"name":"NG"},{"data":[{"x":31564.1221723111,"y":5,"z":6082032,"color":"#666633","name":"Nicaragua"}],"name":"NI"},{"data":[{"x":820725.814742469,"y":239,"z":16936520,"color":"#333366","name":"Netherlands"}],"name":"NL"},{"data":[{"x":319401.440788505,"y":58,"z":5195921,"color":"#333366","name":"Norway"}],"name":"NO"},{"data":[{"x":70090.4592046713,"y":7,"z":28513700,"color":"#ab3d3f","name":"Nepal"}],"name":"NP"},{"data":[{"x":169959.549519437,"y":206,"z":4595700,"color":"#ac7f3e","name":"New Zealand"}],"name":"NZ"},{"data":[{"x":171691.585247737,"y":4,"z":4490541,"color":"#ab3d3f","name":"Oman"}],"name":"OM"},{"data":[{"x":87195.7075575763,"y":10,"z":3929141,"color":"#666633","name":"Panama"}],"name":"PA"},{"data":[{"x":389146.724477517,"y":29,"z":31376670,"color":"#666633","name":"Peru"}],"name":"PE"},{"data":[{"x":21384.4839972304,"y":8,"z":7619321,"color":"#ac7f3e","name":"Papua New Guinea"}],"name":"PG"},{"data":[{"x":741029.139380982,"y":11,"z":100699395,"color":"#ab3d3f","name":"Philippines"}],"name":"PH"},{"data":[{"x":952505.420986737,"y":7,"z":188924874,"color":"#ab3d3f","name":"Pakistan"}],"name":"PK"},{"data":[{"x":993129.04324896,"y":243,"z":37999494,"color":"#333366","name":"Poland"}],"name":"PL"},{"data":[{"x":125861.485459808,"y":42,"z":3474182,"color":"#666633","name":"Puerto Rico"}],"name":"PR"},{"data":[{"x":302328.671399389,"y":95,"z":10348648,"color":"#333366","name":"Portugal"}],"name":"PT"},{"data":[{"x":325.455134940257,"y":5,"z":21291,"color":"#ac7f3e","name":"Palau"}],"name":"PW"},{"data":[{"x":60976.9548897178,"y":9,"z":6639123,"color":"#666633","name":"Paraguay"}],"name":"PY"},{"data":[{"x":321417.765756805,"y":39,"z":2235355,"color":"#ab3d3f","name":"Qatar"}],"name":"QA"},{"data":[{"x":424474.231138591,"y":97,"z":19832389,"color":"#333366","name":"Romania"}],"name":"RO"},{"data":[{"x":95698.1157213005,"y":104,"z":7098247,"color":"#333366","name":"Serbia"}],"name":"RS"},{"data":[{"x":3579826.38738451,"y":279,"z":144096812,"color":"#333366","name":"Russian Federation"}],"name":"RU"},{"data":[{"x":20418.3051893808,"y":8,"z":11609666,"color":"#663333","name":"Rwanda"}],"name":"RW"},{"data":[{"x":1685203.50562379,"y":13,"z":31540372,"color":"#ab3d3f","name":"Saudi Arabia"}],"name":"SA"},{"data":[{"x":1275.8985443584,"y":3,"z":583591,"color":"#ac7f3e","name":"Solomon Islands"}],"name":"SB"},{"data":[{"x":2533.7056107056,"y":10,"z":92900,"color":"#663333","name":"Seychelles"}],"name":"SC"},{"data":[{"x":167908.8492089,"y":6,"z":40234882,"color":"#663333","name":"Sudan"}],"name":"SD"},{"data":[{"x":454867.696457474,"y":156,"z":9798871,"color":"#333366","name":"Sweden"}],"name":"SE"},{"data":[{"x":471630.937868895,"y":25,"z":5535002,"color":"#ab3d3f","name":"Singapore"}],"name":"SG"},{"data":[{"x":64229.460444003,"y":61,"z":2063768,"color":"#333366","name":"Slovenia"}],"name":"SI"},{"data":[{"x":10264.4481422368,"y":4,"z":6453184,"color":"#663333","name":"Sierra Leone"}],"name":"SL"},{"data":[{"x":36776.2206014583,"y":22,"z":15129273,"color":"#663333","name":"Senegal"}],"name":"SN"},{"data":[{"x":9214.03885438621,"y":6,"z":542975,"color":"#666633","name":"Suriname"}],"name":"SR"},{"data":[{"x":594.032197355677,"y":3,"z":190344,"color":"#663333","name":"Sao Tome and Principe"}],"name":"ST"},{"data":[{"x":52701.2743414637,"y":8,"z":6126583,"color":"#666633","name":"El Salvador"}],"name":"SV"},{"data":[{"x":10844.6908802429,"y":2,"z":1286970,"color":"#663333","name":"Swaziland"}],"name":"SZ"},{"data":[{"x":30480.9781041338,"y":2,"z":14037472,"color":"#663333","name":"Chad"}],"name":"TD"},{"data":[{"x":10663.1990593523,"y":5,"z":7304578,"color":"#663333","name":"Togo"}],"name":"TG"},{"data":[{"x":1108108.2403723,"y":52,"z":67959359,"color":"#ab3d3f","name":"Thailand"}],"name":"TH"},{"data":[{"x":23578.5063595683,"y":7,"z":8481855,"color":"#ab3d3f","name":"Tajikistan"}],"name":"TJ"},{"data":[{"x":2812.56600164083,"y":3,"z":1245015,"color":"#ab3d3f","name":"Timor-Leste"}],"name":"TL"},{"data":[{"x":88656.834285516,"y":9,"z":5373502,"color":"#ab3d3f","name":"Turkmenistan"}],"name":"TM"},{"data":[{"x":126598.208594341,"y":62,"z":11107800,"color":"#663333","name":"Tunisia"}],"name":"TN"},{"data":[{"x":552.230754568807,"y":7,"z":106170,"color":"#ac7f3e","name":"Tonga"}],"name":"TO"},{"data":[{"x":1543283.93004842,"y":103,"z":78665830,"color":"#ab3d3f","name":"Turkey"}],"name":"TR"},{"data":[{"x":44334.1287419409,"y":32,"z":1360088,"color":"#666633","name":"Trinidad and Tobago"}],"name":"TT"},{"data":[{"x":37.3862379104201,"y":1,"z":9916,"color":"#ac7f3e","name":"Tuvalu"}],"name":"TV"},{"data":[{"x":339154.695997678,"y":206,"z":45198200,"color":"#333366","name":"Ukraine"}],"name":"UA"},{"data":[{"x":71246.0846786612,"y":21,"z":39032383,"color":"#663333","name":"Uganda"}],"name":"UG"},{"data":[{"x":17946996,"y":545,"z":321418820,"color":"#666633","name":"United States"}],"name":"US"},{"data":[{"x":72750.9831053785,"y":17,"z":3431555,"color":"#666633","name":"Uruguay"}],"name":"UY"},{"data":[{"x":187667.827321432,"y":70,"z":31299500,"color":"#ab3d3f","name":"Uzbekistan"}],"name":"UZ"},{"data":[{"x":787.426590927331,"y":4,"z":264652,"color":"#ac7f3e","name":"Vanuatu"}],"name":"VU"},{"data":[{"x":1144.45376611681,"y":8,"z":193228,"color":"#ac7f3e","name":"Samoa"}],"name":"WS"},{"data":[{"x":723515.99168616,"y":139,"z":54956920.3742456,"color":"#663333","name":"South Africa"}],"name":"ZA"},{"data":[{"x":62458.4096122137,"y":7,"z":16211767,"color":"#663333","name":"Zambia"}],"name":"ZM"},{"data":[{"x":27984.8771946524,"y":35,"z":15602751,"color":"#663333","name":"Zimbabwe"}],"name":"ZW"},{"data":[{"x":37.3862379104201,"y":0.58131388594216,"color":"black","name":"regression line"},{"x":4881115.08253226,"y":167.395103339487,"color":"black","name":"regression line"},{"x":9762192.7788266,"y":233.591313939704,"color":"black","name":"regression line"},{"x":14643270.475121,"y":283.863216053522,"color":"black","name":"regression line"},{"x":19524348.1714153,"y":325.965043707183,"color":"black","name":"regression line"}],"name":"Regression","type":"line","dashStyle":"ShortDash","lineWidth":1,"enableMouseTracking":false,"marker":{"enabled":false}}],"tooltip":{"formatter":"function() { return this.point.name;}","useHTML":true,"borderWidth":1},"legend":{"enabled":false},"xAxis":{"type":"logarithmic","floor":2.6,"maxPadding":0.06,"labels":{"formatter":"function() {return this.value;}"},"opposite":false}},"theme":{"colors":["#ab3d3f","#666699","#669999","#663333","#336666","#366096","#996699","#ac673e","#3a9736","#333366","#999966","#666633","#89a23a","#368596","#996666","#bfa681","#e5dbcd","#d4c3aa","#ac7f3e","#aa8959","#f7f5ed","#efe9e0"],"chart":{"backgroundColor":"#f2f2f2","style":{"fontFamily":"Open Sans Condensed"}},"title":{"align":"left","x":4,"style":{"color":"#1a1a1a","fontFamily":"Open Sans Condensed","fontSize":"1.6em","fontWeight":"bold"}},"subtitle":{"align":"left","x":4,"style":{"color":"#262626","fontFamily":"Open Sans Condensed","fontSize":"1.2em"}},"legend":{"itemStyle":{"fontFamily":"Open Sans Condensed","color":"black"},"itemHoverStyle":{"color":"gray"}},"yAxis":{"gridLineColor":"#CEC6B9","lineColor":"#CEC6B9","gridLineDashStyle":"Dot","labels":{"algn":"left","x":0,"y":-2,"tickLength":0,"tickColor":"#CEC6B9","tickWidth":1,"style":{"fontSize":"1em","color":"#333333"}},"title":{"style":{"fontSize":"1.4em","color":"#333333"}}},"xAxis":{"lineColor":"#CEC6B9","labels":{"style":{"fontSize":"1em","color":"#333333"}},"title":{"margin":17,"style":{"fontSize":"1.4em","color":"#333333"}}},"tooltip":{"style":{"fontFamily":"Open Sans","fontSize":"1em"}}},"conf_opts":{"global":{"Date":null,"VMLRadialGradientURL":"http =//code.highcharts.com/list(version)/gfx/vml-radial-gradient.png","canvasToolsURL":"http =//code.highcharts.com/list(version)/modules/canvas-tools.js","getTimezoneOffset":null,"timezoneOffset":0,"useUTC":true},"lang":{"contextButtonTitle":"Chart context menu","decimalPoint":".","downloadJPEG":"Download JPEG image","downloadPDF":"Download PDF document","downloadPNG":"Download PNG image","downloadSVG":"Download SVG vector image","drillUpText":"Back to {series.name}","invalidDate":null,"loading":"Loading...","months":["January","February","March","April","May","June","July","August","September","October","November","December"],"noData":"No data to display","numericSymbols":["k","M","G","T","P","E"],"printChart":"Print chart","resetZoom":"Reset zoom","resetZoomTitle":"Reset zoom level 1:1","shortMonths":["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],"thousandsSep":" ","weekdays":["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"]}},"type":"chart","fonts":["Open+Sans Condensed","Open+Sans"],"debug":false},"evals":["hc_opts.yAxis.labels.formatter","hc_opts.tooltip.formatter","hc_opts.xAxis.labels.formatter"],"jsHooks":[]}</script>
+    </div>
+    <div id="cite">afasdfdasf</div>
+    <script type="text/javascript" src="https://www.swissinfo.ch/static/Themes/basic/js/vendor/iframeResizer.contentWindow.3.5.3.min.js"></script>
+  </body>
+</html>
+</body>
+</html>
