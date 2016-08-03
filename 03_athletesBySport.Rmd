@@ -133,7 +133,7 @@ interactive_chart <- function(gpath, fontname = 'Open Sans Condensed') {
     tooltip_opacity = 0.7,
     pointsize = 12,
     width = "100%",
-    height_svg = 5,
+    height_svg = 4.5,
     width_svg = 4,
     fontname_sans = fontname,
     fontname_serif = fontname
@@ -174,7 +174,7 @@ graphGroup <- function(dd = dd, sp = sp, gr = gr, d.all = d.all) {
     geom_hline(
       data = d.all %>% filter(group == gr), 
       aes(yintercept = prop.all), 
-      linetype = 3, size = 1, alpha = 0.8, colour = "#404040"
+      linetype = 2, size = 1, alpha = 0.8, colour = "#00334d"
     ) +
     geom_text(
       aes(label = iso2c), vjust = 1.8, 
