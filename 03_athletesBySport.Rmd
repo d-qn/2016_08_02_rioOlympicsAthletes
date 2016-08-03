@@ -31,8 +31,9 @@ library(swiRcharts)
 ```{r settings}
 rio.file <- "input/athletes_rio2016.csv"
 sports.file <- "input/summer Olympic sport grouping - Sheet1.csv"
+trad.file <- "input/Rio althetes by sport - Sheet1.csv"
 
-spitOutGroupSports <- T
+spitOutGroupSports <- F
 
 countries <- data.frame(names = c(
   "Switzerland", "Brazil", "United States", "China", "Russia", 
@@ -49,6 +50,18 @@ sports <- read_csv(sports.file)
 cat("\nTotal number of athletes: " )
 cat(nrow(athletes))
 
+txt <- read.csv(trad.file, row.names = 1, stringsAsFactors = F)
+# discard incomplete translations
+cidx <- unique(which(txt =="" | is.na(txt), T)[,2])
+if(length(cidx > 0)) {
+  warning(paste(colnames(txt)[cidx], collapse = "\t"), " languages will be discarded!", "\n")
+  txt <- txt[,-cidx, drop = F]
+}
+colnames(txt)
+
+```
+
+```{r wrangle data, include = F}
 if(spitOutGroupSports) {
   sportGroups <- do.call(rbind, by(sports, sports$group, function(ddd) {
     data.frame(group = unique(ddd$group), sports = paste0(ddd$sport, collapse = ", "))
@@ -62,7 +75,11 @@ athletes$group <- unlist(sports[idx, 'group'], use.names = F)
 
 dat <- athletes %>% group_by(group, country, iso3) %>% summarise(value = length(athletes)) %>% ungroup()
 dat %<>% group_by(country, iso3) %>% mutate(total = sum(value)) %>% ungroup()
-dat$prop <- round((dat$value / dat$total) * 100)
+dat$prop <- round((dat$value / dat$total) * 100, 1)
+
+dev100 <- dat %>% group_by(country) %>% summarise(totest = sum(prop)) %>% 
+  ungroup() %>% select(totest) - 100
+stopifnot(abs(dev100) < 1)
 
 data <- dat %>% filter(iso3 %in% countries$ioc)
 d.all <- data %>% group_by(group) %>% 
@@ -77,13 +94,14 @@ data$country <- factor(data$country, levels = as.character(countries$names))
 data$iso2c <- countrycode(data$iso3, "ioc", "iso2c")
 ```
 
+
+
 ```{r visualize trial, include = F}
 ### ggplot2 theme
 myTheme <- function(base_family = "OpenSans-CondensedLight", title_family = "OpenSans-CondensedBold") {
   swi_theme(base_size = 14, base_family = base_family, title_family = title_family, y_gridlines = F) +
     theme(
       strip.text.x = element_text(family = title_family, hjust = 0, vjust = 1, size = 14),
-      #axis.text.x = element_text(angle = 45, hjust = 1,  margin = margin(t = -16), size = 11),
       axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5, margin = margin(t = -17), size = 11.5),
       axis.line.x = element_blank(),
       axis.ticks.x = element_blank(),
@@ -122,54 +140,143 @@ interactive_chart <- function(gpath, fontname = 'Open Sans Condensed') {
   ) 
 }
 
-
-gr <- 'Team Sports'
-maxV <- data %>% group_by(group, country) %>% summarise(max = max(prop, na.rm = T)) %>% ungroup() %>% unlist(use.names = F) %>% max()
-
-# interactive!
-charts <- lapply(levels(data$group), function(gr) {
+# Plot by sport group subsets of the data (no faceting) and generate HTML text
+graphGroup <- function(dd = dd, sp = sp, gr = gr, d.all = d.all) {
+  #dd %>% filter(as.character(group) == gr)
+  ddd <- dd[which(dd$group == gr),]
   
-  dd <- data %>% filter(group == gr)
-  underlying.sports <- unlist(sports[which(sports$group == gr),'sport'], use.names = F)
-  dd$tooltip <- paste0(
-    "<b>", as.character(dd$country), "</b><br>",
-    dd$prop, "%<br>",
-        '<div><span style="font-size: 0.8em">',
-    "(", dd$value, " / ", dd$total, ")",
+  subt1 <- txt[paste0(gr, ".underlying"), lang]  
+  
+  ddd$tooltip <- paste0(
+    "<b>", as.character(ddd$ct), "</b><br>",
+    ddd$prop, "%",'<div><span style="font-size: 0.8em">',
+    txt[gr, lang], "<br>(", ddd$value, " / ", ddd$total, ")",
     "</span></div>"
   )    
     
-  chart <- ggplot(data = dd, aes(x = country, tooltip = tooltip, data_id_ = country, y = prop, group = country, fill = country)) + 
+  chart <- ggplot(
+    data = ddd, 
+    aes(
+      x = ct, 
+      tooltip = tooltip, 
+      data_id_ = ct, 
+      y = prop, 
+      group = ct, 
+      fill = ct)
+    ) + 
     geom_bar_interactive(stat = "identity")  +
     myTheme() + 
     scale_fill_manual(values = swi_rpal, drop = F) +
     scale_y_continuous(name = "", breaks = pretty_breaks(n = 3), limits = c(0, maxV)) + 
     scale_x_discrete(name = "", expand = c(0,0.1), drop=FALSE)
+  
   gg <- chart +
-    geom_hline(data = d.all %>% filter(group == gr), aes(yintercept = prop.all), linetype = 3, size = 0.8, alpha = 0.9, colour = "#ffe6ff") +
-    geom_text(aes(label = iso2c), vjust = 1.8, color = "#f7f5ed", family =  "OpenSans-CondensedBold", size = 3) 
-  list(chart = gg, title = gr, subtitle = paste(underlying.sports, collapse =", "))
-})
+    geom_hline(
+      data = d.all %>% filter(group == gr), 
+      aes(yintercept = prop.all), 
+      linetype = 3, size = 1, alpha = 0.8, colour = "#404040"
+    ) +
+    geom_text(
+      aes(label = iso2c), vjust = 1.8, 
+      color = "#f7f5ed", family = txt['title_family', lang], size = 3.3
+    ) 
+  list(chart = gg, title = txt[gr, lang], subtitle = subt1, pad = txt[paste0(gr,".padding"), lang])
+}
 
 
- save_html(
-  tags$html(
-    tags$head(includeHTML("styles.html")),
-    tags$body(
-    h2(HTML("Rio 2016 olympics - how country delegations differs in sports?")),
-    div(class = "descr",  HTML("Percentage by country delegation and by sport groups of athletes competing at the Rio 2016 summer olympics. The dotted horizontal line correspond to proportion of athletes over all nations.<br>The different sport groups are shown by order of importance")),
-    div(class = "container",
-     lapply(1:length(charts), function(i) {
-       div(class = "graphic", 
-          h3(HTML(charts[[i]]$title)),
-          div(class = "subtitle",  HTML(charts[[i]]$subtitle)),
-          interactive_chart(charts[[i]]$chart)
-       )      
-     })
-    ),
-    HTML(iframeresizer)
-    )), file = "interactive_dev.html", libdir = "js"
+maxV <- data %>% group_by(group, country) %>% 
+  summarise(max = max(prop, na.rm = T)) %>% ungroup() %>% 
+  unlist(use.names = F) %>% max()
+
+
+lang <- 'EN'
+gr <- 'Team Sports'
+
+for (lang in colnames(txt)) {
+  dd <- data
+  sp <- sports
+  
+  ## get tranlsations
+  midx <- match(dd$iso3, row.names(txt))
+  stopifnot(!any(is.na(midx)))
+  dd$ct <- txt[midx, lang]
+  # order country levels
+  midx <- dd[match(levels(dd$country), dd$country), 'iso3'] %>% unlist()
+  stopifnot(!any(is.na(midx)))
+  dd$ct <- factor(dd$ct, levels = txt[match(midx, row.names(txt)), lang])
+ 
+  midx <- match(as.character(dd$group), row.names(txt))
+  stopifnot(!any(is.na(midx)))
+  dd$gr <- txt[midx, lang]
+  
+  midx <- match(paste0(sp$group, ".underlying"), row.names(txt))
+  if(any(is.na(midx))) {
+    stop(paste0(sp$group, ".underlying")[is.na(midx)])
+  }
+  sp$gr <- txt[midx, lang]
+  
+  # magic happening
+  charts <- lapply(levels(dd$group), function(gr) graphGroup(dd = dd, sp = sp, gr, d.all))
+
+  save_html(
+    tags$html(
+      tags$head(includeHTML("styles.html")),
+      tags$body(
+        h2(HTML(txt["main.title", lang])),
+        div(class = "descr", HTML(paste0(txt["descr1", lang], "<br>", txt["descr2", lang]))),
+        div(class = "container",
+            lapply(1:length(charts), function(i) {
+              div(class = "graphic", 
+                  h3(HTML(charts[[i]]$title)),
+                  div(class = "subtitle",  HTML(paste0(charts[[i]]$subtitle, charts[[i]]$pad))),
+                  interactive_chart(charts[[i]]$chart)
+              )      
+            })
+        ),
+        HTML(iframeresizer)
+      )), file = paste0("rio2016_barBySportAndNations_", lang, ".html"), libdir = "js"
   )
+
+}
+
+
+
+
+
+
+
+
+
+
+
+# 
+# 
+# 
+# # interactive!
+# charts <- lapply(levels(data$group), function(gr) {
+#   
+#   dd <- data %>% filter(group == gr)
+#   underlying.sports <- unlist(sports[which(sports$group == gr),'sport'], use.names = F)
+#   dd$tooltip <- paste0(
+#     "<b>", as.character(dd$country), "</b><br>",
+#     dd$prop, "%<br>",
+#         '<div><span style="font-size: 0.8em">',
+#     "(", dd$value, " / ", dd$total, ")",
+#     "</span></div>"
+#   )    
+#     
+#   chart <- ggplot(data = dd, aes(x = country, tooltip = tooltip, data_id_ = country, y = prop, group = country, fill = country)) + 
+#     geom_bar_interactive(stat = "identity")  +
+#     myTheme() + 
+#     scale_fill_manual(values = swi_rpal, drop = F) +
+#     scale_y_continuous(name = "", breaks = pretty_breaks(n = 3), limits = c(0, maxV)) + 
+#     scale_x_discrete(name = "", expand = c(0,0.1), drop=FALSE)
+#   gg <- chart +
+#     geom_hline(data = d.all %>% filter(group == gr), aes(yintercept = prop.all), linetype = 3, size = 0.8, alpha = 0.9, colour = "#ffe6ff") +
+#     geom_text(aes(label = iso2c), vjust = 1.8, color = "#f7f5ed", family =  "OpenSans-CondensedBold", size = 3) 
+#   list(chart = gg, title = gr, subtitle = paste(underlying.sports, collapse =", "))
+# })
+# 
 
 
 ```
