@@ -1,10 +1,10 @@
 sport,federation,group
-archery,Archery,Archery
+archery,Archery,Other Sports
 artistic-gymnastics,Gymnastics,Gymnastics
 athletics,Athletics,Athletics
 badminton,Badminton,Racquet Sports
 basketball,Basketball,Team Sports
-beach-volleyball,Volleyball,Beach Volleyball
+beach-volleyball,Volleyball,Other Sports
 boxing,Boxing,Combat Sports
 canoe-slalom,Canoe,Canoe
 canoe-sprint,Canoe,Canoe
@@ -16,6 +16,7 @@ diving,Aquatics,Aquatics
 equestrian,Equestrian,Equestrian
 fencing,Fencing,Fencing
 football,Football,Team Sports
+golf,Golf,Other Sports
 handball,Handball,Team Sports
 hockey,Hockey,Team Sports
 judo,Judo,Combat Sports
@@ -35,5 +36,5 @@ trampoline-gymnastics,Gymnastics,Gymnastics
 triathlon,Triathlon,Pentathlon & Triathlon
 volleyball,Volleyball,Team Sports
 water-polo,Aquatics,Team Sports
-weightlifting,Weightlifting,Weightlifting
+weightlifting,Weightlifting,Other Sports
 wrestling,Wrestling,Combat Sports
