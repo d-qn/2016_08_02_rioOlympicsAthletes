@@ -4,15 +4,12 @@ author: "Duc-Quang Nguyen"
 date: "2 Aug 2016"
 output: html_document
 ---
-
-
 ## Data
 
 ### Grouping of sports
 * Grouping of olympic sports: https://en.wikipedia.org/wiki/Olympic_sports
 * https://en.wikipedia.org/wiki/Combat_sport#Olympic_Combat_Sports
 * Team sports: https://en.wikipedia.org/wiki/Team_sport#Olympic_team_sports
-
 
 ```{r setup, include=FALSE}
 library(readr)
@@ -27,12 +24,15 @@ library(swiTheme)
 
 ### Interactive 
 library(ggiraph)
-library(svglite)
 library(htmltools)
 library(swiRcharts)
+```
 
+```{r settings}
 rio.file <- "input/athletes_rio2016.csv"
 sports.file <- "input/summer Olympic sport grouping - Sheet1.csv"
+
+spitOutGroupSports <- T
 
 countries <- data.frame(names = c(
   "Switzerland", "Brazil", "United States", "China", "Russia", 
@@ -40,17 +40,21 @@ countries <- data.frame(names = c(
   "France", "Spain", "United Kingdom")
 )
 countries$ioc <- countrycode(countries$names, "country.name", "ioc")
-
-### Misc stuff
-#require(classInt)
-#require(viridis)
 ```
 
 ```{r load data}
 athletes <- read_csv(rio.file)
 sports <- read_csv(sports.file)
 
-nrow(athletes)
+cat("\nTotal number of athletes: " )
+cat(nrow(athletes))
+
+if(spitOutGroupSports) {
+  sportGroups <- do.call(rbind, by(sports, sports$group, function(ddd) {
+    data.frame(group = unique(ddd$group), sports = paste0(ddd$sport, collapse = ", "))
+  }))
+  write.csv(sportGroups, "data/sportGroupsForTranslation.csv")
+}
 
 idx <- match(athletes$sport, sports$sport)
 stopifnot(!any(is.na(idx)))
@@ -59,7 +63,6 @@ athletes$group <- unlist(sports[idx, 'group'], use.names = F)
 dat <- athletes %>% group_by(group, country, iso3) %>% summarise(value = length(athletes)) %>% ungroup()
 dat %<>% group_by(country, iso3) %>% mutate(total = sum(value)) %>% ungroup()
 dat$prop <- round((dat$value / dat$total) * 100)
-
 
 data <- dat %>% filter(iso3 %in% countries$ioc)
 d.all <- data %>% group_by(group) %>% 
@@ -72,11 +75,9 @@ data$group <- factor(data$group, levels = d.all$group)
 data$country <- gsub("Russian Federation", "Russia", data$country)
 data$country <- factor(data$country, levels = as.character(countries$names))
 data$iso2c <- countrycode(data$iso3, "ioc", "iso2c")
-
-
 ```
 
-```{r visualize trial}
+```{r visualize trial, include = F}
 ### ggplot2 theme
 myTheme <- function(base_family = "OpenSans-CondensedLight", title_family = "OpenSans-CondensedBold") {
   swi_theme(base_size = 14, base_family = base_family, title_family = title_family, y_gridlines = F) +
@@ -101,11 +102,11 @@ ggplot(data = data, aes(x = country, y = prop, group = country, fill = country))
 
 ```
 
-## Generate each sport group as a standaline graphic
+## Generate each sport group as a standalone graphic
 
 (instead of faceting)
 
-```{r prod graphics}
+```{r prod graphics, include = F}
 ### print interactive chart
 interactive_chart <- function(gpath, fontname = 'Open Sans Condensed') {
   ggiraph(
@@ -151,8 +152,6 @@ charts <- lapply(levels(data$group), function(gr) {
 })
 
 
-
-
  save_html(
   tags$html(
     tags$head(includeHTML("styles.html")),
@@ -171,8 +170,6 @@ charts <- lapply(levels(data$group), function(gr) {
     HTML(iframeresizer)
     )), file = "interactive_dev.html", libdir = "js"
   )
- 
-
 
 
 ```
