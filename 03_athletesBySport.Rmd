@@ -266,7 +266,7 @@ for (lang in colnames(txt)) {
       tags$head(includeHTML("styles.html")),
       tags$body(
         h2(HTML(txt["main.title", lang])),
-        div(class = "descr", HTML(paste0(txt["descr1", lang], " ", txt["descr2", lang]))),
+        div(class = "descr", HTML(paste0(txt["descr1", lang]))),
         div(class = "container",
             lapply(1:length(charts), function(i) {
               div(class = "graphic", 
@@ -276,7 +276,7 @@ for (lang in colnames(txt)) {
               )      
             })
         ),
-        div(id = "cite", HTML("Source asfasdfsadf")),
+        div(id = "cite", HTML(paste0(txt['source', lang], ": ", txt['source.name', lang]), " | swissinfo.ch |", htmlLink("https://twitter.com/duc_qn", "@duc_qn"))),
         HTML(iframeresizer)
       )), file = paste0("rio2016_barBySportAndNations_", lang, ".html"), libdir = "js"
   )
