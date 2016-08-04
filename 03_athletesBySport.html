@@ -122,20 +122,44 @@ $(document).ready(function () {
 </div>
 
 
-<div id="data" class="section level2">
-<h2>Data</h2>
+<div id="ressources" class="section level2">
+<h2>Ressources</h2>
+</div>
+<div id="icons-folder-needs-to-be-copied" class="section level1">
+<h1>Icons folder needs to be copied !!</h1>
 <div id="grouping-of-sports" class="section level3">
 <h3>Grouping of sports</h3>
 <ul>
 <li>Grouping of olympic sports: <a href="https://en.wikipedia.org/wiki/Olympic_sports" class="uri">https://en.wikipedia.org/wiki/Olympic_sports</a></li>
 <li><a href="https://en.wikipedia.org/wiki/Combat_sport#Olympic_Combat_Sports" class="uri">https://en.wikipedia.org/wiki/Combat_sport#Olympic_Combat_Sports</a></li>
 <li>Team sports: <a href="https://en.wikipedia.org/wiki/Team_sport#Olympic_team_sports" class="uri">https://en.wikipedia.org/wiki/Team_sport#Olympic_team_sports</a></li>
+<li><a href="https://docs.google.com/spreadsheets/d/1WDkHi7tJCp2GRZPgdh4hZuSeYf5flCaeqdtnF-S4DRE/edit#gid=0">My own sport grouping</a></li>
+<li>Summer olympics open source icons: <a href="https://commons.wikimedia.org/wiki/Category:Summer_Olympics_pictograms" class="uri">https://commons.wikimedia.org/wiki/Category:Summer_Olympics_pictograms</a></li>
 </ul>
+</div>
+<div id="stats" class="section level2">
+<h2>Stats</h2>
+<ul>
+<li>Data last scraped: 2016-08-04 7h GMT, <a href="https://docs.google.com/spreadsheets/d/1WDkHi7tJCp2GRZPgdh4hZuSeYf5flCaeqdtnF-S4DRE/edit?usp=sharing">google sheet</a></li>
+<li>Swiss no teams</li>
+<li>Russia</li>
+<li><a href="http://www.npr.org/sections/thetorch/2016/08/02/487642811/the-russian-tally-more-than-110-athletes-barred-from-the-olympics">More than 110 Russian athletes banned</a></li>
+<li><a href="http://www.sbnation.com/2016/8/3/12371506/119-russian-athletes-banned-rio-olympics-doping-scandal">entire weightlifting team, all but one member of the track and field team</a></li>
+<li>Cycling</li>
+<li>Horse riding</li>
+<li></li>
+</ul>
+</div>
+<div id="findings" class="section level2">
+<h2>Findings</h2>
 <pre class="r"><code>rio.file &lt;- &quot;input/athletes_rio2016.csv&quot;
 sports.file &lt;- &quot;input/summer Olympic sport grouping - Sheet1.csv&quot;
 trad.file &lt;- &quot;input/Rio althetes by sport - Sheet1.csv&quot;
+icon.file &lt;- &quot;input/Rio 20106 summer Olympic athletes list - sportGroup2icons.csv&quot;
+
 
 spitOutGroupSports &lt;- F
+plotDevStaticGraphic &lt;- F
 
 countries &lt;- data.frame(names = c(
   &quot;Switzerland&quot;, &quot;Brazil&quot;, &quot;United States&quot;, &quot;China&quot;, &quot;Russia&quot;, 
@@ -150,7 +174,7 @@ cat(&quot;\nTotal number of athletes: &quot; )</code></pre>
 <pre><code>## 
 ## Total number of athletes:</code></pre>
 <pre class="r"><code>cat(nrow(athletes))</code></pre>
-<pre><code>## 11395</code></pre>
+<pre><code>## 11389</code></pre>
 <pre class="r"><code>txt &lt;- read.csv(trad.file, row.names = 1, stringsAsFactors = F)
 # discard incomplete translations
 cidx &lt;- unique(which(txt ==&quot;&quot; | is.na(txt), T)[,2])
@@ -161,11 +185,18 @@ if(length(cidx &gt; 0)) {
 <pre><code>## Warning: FR  DE  IT  PT  RU  ES  JA  ZH  X   X.1 X.2 X.3 languages will be discarded!</code></pre>
 <pre class="r"><code>colnames(txt)</code></pre>
 <pre><code>## [1] &quot;EN&quot;</code></pre>
-</div>
+<pre class="r"><code># check icons are present
+cat(&quot;\nAssuming icons are in a 'icons/' folder&quot;)</code></pre>
+<pre><code>## 
+## Assuming icons are in a 'icons/' folder</code></pre>
+<pre class="r"><code>group2icon &lt;- read_csv(icon.file)
+group2icon$icon &lt;- paste0(ifelse(is.na(group2icon$icon), &quot;&quot;, &quot;icons/&quot;), group2icon$icon)
+stopifnot(all(file.exists(group2icon$icon[group2icon$icon != 'NA'])))</code></pre>
 </div>
 <div id="generate-each-sport-group-as-a-standalone-graphic" class="section level2">
 <h2>Generate each sport group as a standalone graphic</h2>
 <p>(instead of faceting)</p>
+</div>
 </div>
 
 

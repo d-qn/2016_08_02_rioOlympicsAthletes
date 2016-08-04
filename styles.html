@@ -2,7 +2,7 @@
 
 <style>
 
-body, h1, h2, h3, h4, h5, h6, .descr, .subtitle {
+body, h1, h2, h3, h4, h5, h6, .descr, .subtitle, #cite, .footer {
    text-rendering: optimizeLegibility;
    font-smoothing: antialiased;
    font-family: 'Open Sans Condensed', sans-serif;
@@ -12,13 +12,24 @@ body, h1, h2, h3, h4, h5, h6, .descr, .subtitle {
 
 
 #cite {
-    font-size: 0.9em;  font-weight: lighter; color: #B8B8B8; text-align: right; margin-top:1px; margin-right:10px; padding-bottom: 3px;
+    position: fixed;
+    bottom:0;
+    font-size: 0.9em;  
+    font-weight: lighter; 
+    color: #4d4d4d; 
+    text-align: right; 
+    margin-top:10px; 
+    margin-left:2%; 
+    margin-right:10px; 
+    padding-bottom: 3px;
 }
 #cite a { text-decoration: none; color: #821122; }
 
 .container {
     width: 100%;
+    min-height:100%;
     position: relative;
+    padding-bottom:20px;   
 }
 
 
@@ -34,20 +45,19 @@ body, h1, h2, h3, h4, h5, h6, .descr, .subtitle {
 .descr {
  font-size: 1.1em;
  color: #4d4d4d;
- line-height: 102%;
  font-weight: lighter;
- max-width:97%;
+ max-width:93%;
  margin-left:1%;
+ margin-bottom:5px; 
 }
 
 .subtitle{
  font-size: 0.8em;
-  line-height: 98%;
-/* color: #e6e6e6;*/
+ line-height: 98%;
  color: #4d4d4d;
  font-weight: lighter;
  max-width:97%;
- margin-left:2%;	
+ margin-left:3%;	
 }
 
 h1 {
@@ -58,13 +68,14 @@ h2 {
    font-size:1.6em;
    line-height: 105%;
    font-weight: bolder;
-   max-width:90%;
+   max-width:88%;
    margin-left:1%;
 }
 
 h3 {
    font-size:1.2em;
-   margin-left:2%;     
+   margin-left:2%; 
+   color: #003333;    
 }
 
 h4 {
@@ -86,10 +97,16 @@ a:visited {
 
 
 body {
-      max-width:100%;
-   }
+    max-width:100%;
+    
+    background-image: url('icons/2016_Summer_Olympics_logo.svg.png');
+    background-size: 63px 80px;
+    background-repeat: no-repeat;
+    background-attachment: absolute;
+    background-position: 99.5% 0.15%; 
+}
 
-   a, a:visited {
+a, a:visited {
       text-decoration: underline;
    }
 }

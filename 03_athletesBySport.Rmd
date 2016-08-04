@@ -6,10 +6,15 @@ output: html_document
 ---
 ## Ressources
 
+
+# Icons folder needs to be copied !!
+
 ### Grouping of sports
 * Grouping of olympic sports: https://en.wikipedia.org/wiki/Olympic_sports
 * https://en.wikipedia.org/wiki/Combat_sport#Olympic_Combat_Sports
 * Team sports: https://en.wikipedia.org/wiki/Team_sport#Olympic_team_sports
+* [My own sport grouping](https://docs.google.com/spreadsheets/d/1WDkHi7tJCp2GRZPgdh4hZuSeYf5flCaeqdtnF-S4DRE/edit#gid=0)
+* Summer olympics open source icons: https://commons.wikimedia.org/wiki/Category:Summer_Olympics_pictograms
 
 
 ## Stats
@@ -39,6 +44,9 @@ library(scales)
 library(swiMap)
 library(swiTheme)
 
+library(png)
+library(grid)
+
 ### Interactive 
 library(ggiraph)
 library(htmltools)
@@ -49,6 +57,8 @@ library(swiRcharts)
 rio.file <- "input/athletes_rio2016.csv"
 sports.file <- "input/summer Olympic sport grouping - Sheet1.csv"
 trad.file <- "input/Rio althetes by sport - Sheet1.csv"
+icon.file <- "input/Rio 20106 summer Olympic athletes list - sportGroup2icons.csv"
+
 
 spitOutGroupSports <- F
 plotDevStaticGraphic <- F
@@ -77,6 +87,12 @@ if(length(cidx > 0)) {
 }
 colnames(txt)
 
+# check icons are present
+cat("\nAssuming icons are in a 'icons/' folder")
+group2icon <- read_csv(icon.file)
+group2icon$icon <- paste0(ifelse(is.na(group2icon$icon), "", "icons/"), group2icon$icon)
+stopifnot(all(file.exists(group2icon$icon[group2icon$icon != 'NA'])))
+
 ```
 
 ```{r wrangle data, include = F}
@@ -93,15 +109,15 @@ athletes$group <- unlist(sports[idx, 'group'], use.names = F)
 
 dat <- athletes %>% group_by(group, country, iso3) %>% summarise(value = length(athletes)) %>% ungroup()
 dat %<>% group_by(country, iso3) %>% mutate(total = sum(value)) %>% ungroup()
-dat$prop <- round((dat$value / dat$total) * 100, 1)
+dat$prop <- round((dat$value / dat$total), 3)
 
 dev100 <- dat %>% group_by(country) %>% summarise(totest = sum(prop)) %>% 
-  ungroup() %>% select(totest) - 100
-stopifnot(abs(dev100) < 1)
+  ungroup() %>% select(totest) - 1
+stopifnot(abs(dev100) < .01)
 
 data <- dat %>% filter(iso3 %in% countries$ioc)
 d.all <- data %>% group_by(group) %>% 
-  summarise(prop.all = (sum(value, na.rm = T) / sum(dat$value)) * 100) %>% 
+  summarise(prop.all = (sum(value, na.rm = T) / sum(dat$value))) %>% 
   ungroup() %>% arrange(desc(prop.all))
 d.all$group <- factor(d.all$group, levels = d.all$group)
 
@@ -110,14 +126,16 @@ data$group <- factor(data$group, levels = d.all$group)
 data$country <- gsub("Russian Federation", "Russia", data$country)
 data$country <- factor(data$country, levels = as.character(countries$names))
 data$iso2c <- countrycode(data$iso3, "ioc", "iso2c")
-```
 
+stopifnot(all(levels(data$group) %in% group2icon$group))
+
+```
 
 
 ```{r visualize theme, include = F}
 ### ggplot2 theme
 myTheme <- function(base_family = "OpenSans-CondensedLight", title_family = "OpenSans-CondensedBold") {
-  swi_theme(base_size = 14, base_family = base_family, title_family = title_family, y_gridlines = F) +
+  swi_theme(base_size = 14, base_family = base_family, title_family = title_family) +
     theme(
       strip.text.x = element_text(family = title_family, hjust = 0, vjust = 1, size = 14),
       axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5, margin = margin(t = -17), size = 11.5),
@@ -135,7 +153,7 @@ if(plotDevStaticGraphic) {
     scale_fill_manual(values = swi_rpal, drop=FALSE) +
     scale_x_discrete(name = "", expand = c(0,0)) +
     geom_hline(data = d.all, aes(yintercept = prop.all), linetype = 7, size = 0.2, alpha = 0.6) +
-    geom_text(aes(label = iso2c), vjust=1.5, color = "#f7f5ed", family =  "OpenSans-CondensedBold", size = 3)  
+    geom_text(aes(label = iso2c), vjust=1.5, color = "#f7f5ed", family =  "OpenSans-CondensedBold", size = 3) 
 }
 ```
 
@@ -160,19 +178,24 @@ interactive_chart <- function(gpath, fontname = 'Open Sans Condensed') {
 }
 
 # Plot by sport group subsets of the data (no faceting) and generate HTML text
-graphGroup <- function(dd = dd, sp = sp, gr = gr, d.all = d.all) {
+graphGroup <- function(dd = dd, sp = sp, gr = gr, d.all = d.all, group2icon = group2icon) {
   #dd %>% filter(as.character(group) == gr)
   ddd <- dd[which(dd$group == gr),]
   
   subt1 <- txt[paste0(gr, ".underlying"), lang]  
   
+  # ititle & icon
+  icon.path <- group2icon[which(group2icon$group == gr), 'icon'] %>% unlist()
+  icon.html <- ifelse(icon.path == 'NA', '', paste0('<img src="', icon.path, '" alt="',  gr ,' icon" height="27" width="27">'))
+  tit <- paste0(icon.html,  "&nbsp; ", txt[gr, lang])
+  
   ddd$tooltip <- paste0(
     "<b>", as.character(ddd$ct), "</b><br>",
-    ddd$prop, "%",'<div><span style="font-size: 0.8em">',
+    ddd$prop * 100, "%",'<div><span style="font-size: 0.8em">',
     txt[gr, lang], "<br>(", ddd$value, " / ", ddd$total, ")",
     "</span></div>"
   )    
-    
+  
   chart <- ggplot(
     data = ddd, 
     aes(
@@ -186,7 +209,7 @@ graphGroup <- function(dd = dd, sp = sp, gr = gr, d.all = d.all) {
     geom_bar_interactive(stat = "identity")  +
     myTheme() + 
     scale_fill_manual(values = swi_rpal, drop = F) +
-    scale_y_continuous(name = "", breaks = pretty_breaks(n = 3), limits = c(0, maxV)) + 
+    scale_y_continuous(name = "", breaks = pretty_breaks(n = 3), limits = c(0, maxV), labels = percent) + 
     scale_x_discrete(name = "", expand = c(0,0.1), drop=FALSE)
   
   gg <- chart +
@@ -197,14 +220,12 @@ graphGroup <- function(dd = dd, sp = sp, gr = gr, d.all = d.all) {
     ) +
     geom_text(
       aes(label = iso2c), vjust = 1.8, 
-      color = "#f7f5ed", family = txt['title_family', lang], size = 3.3
+      color = "#f7f5ed", family = txt['title_family', lang], size = 3.8
     ) 
-  list(chart = gg, title = txt[gr, lang], subtitle = subt1, pad = txt[paste0(gr,".padding"), lang])
+  list(chart = gg, title = tit, subtitle = subt1, pad = txt[paste0(gr,".padding"), lang])
 }
 
-maxV <- data %>% group_by(group, country) %>% 
-  summarise(max = max(prop, na.rm = T)) %>% ungroup() %>% 
-  unlist(use.names = F) %>% max()
+maxV <- max(data$prop)
 
 ```
 
@@ -238,14 +259,14 @@ for (lang in colnames(txt)) {
   sp$gr <- txt[midx, lang]
   
   # magic happening
-  charts <- lapply(levels(dd$group), function(gr) graphGroup(dd = dd, sp = sp, gr, d.all))
+  charts <- lapply(levels(dd$group), function(gr) graphGroup(dd = dd, sp = sp, gr, d.all, group2icon))
 
   save_html(
     tags$html(
       tags$head(includeHTML("styles.html")),
       tags$body(
         h2(HTML(txt["main.title", lang])),
-        div(class = "descr", HTML(paste0(txt["descr1", lang], "<br>", txt["descr2", lang]))),
+        div(class = "descr", HTML(paste0(txt["descr1", lang], " ", txt["descr2", lang]))),
         div(class = "container",
             lapply(1:length(charts), function(i) {
               div(class = "graphic", 
@@ -255,6 +276,7 @@ for (lang in colnames(txt)) {
               )      
             })
         ),
+        div(id = "cite", HTML("Source asfasdfsadf")),
         HTML(iframeresizer)
       )), file = paste0("rio2016_barBySportAndNations_", lang, ".html"), libdir = "js"
   )
