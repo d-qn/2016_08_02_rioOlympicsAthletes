@@ -4,12 +4,29 @@ author: "Duc-Quang Nguyen"
 date: "2 Aug 2016"
 output: html_document
 ---
-## Data
+## Ressources
 
 ### Grouping of sports
 * Grouping of olympic sports: https://en.wikipedia.org/wiki/Olympic_sports
 * https://en.wikipedia.org/wiki/Combat_sport#Olympic_Combat_Sports
 * Team sports: https://en.wikipedia.org/wiki/Team_sport#Olympic_team_sports
+
+
+## Stats
+
+* Data last scraped: 2016-08-04 7h GMT, [google sheet](https://docs.google.com/spreadsheets/d/1WDkHi7tJCp2GRZPgdh4hZuSeYf5flCaeqdtnF-S4DRE/edit?usp=sharing)
+* Swiss no teams
+* Russia
+  * [More than 110 Russian athletes banned](http://www.npr.org/sections/thetorch/2016/08/02/487642811/the-russian-tally-more-than-110-athletes-barred-from-the-olympics)
+  * [entire weightlifting team, all but one member of the track and field team](http://www.sbnation.com/2016/8/3/12371506/119-russian-athletes-banned-rio-olympics-doping-scandal)
+* Cycling
+* Horse riding
+* 
+
+
+## Findings
+
+
 
 ```{r setup, include=FALSE}
 library(readr)
@@ -34,6 +51,7 @@ sports.file <- "input/summer Olympic sport grouping - Sheet1.csv"
 trad.file <- "input/Rio althetes by sport - Sheet1.csv"
 
 spitOutGroupSports <- F
+plotDevStaticGraphic <- F
 
 countries <- data.frame(names = c(
   "Switzerland", "Brazil", "United States", "China", "Russia", 
@@ -96,7 +114,7 @@ data$iso2c <- countrycode(data$iso3, "ioc", "iso2c")
 
 
 
-```{r visualize trial, include = F}
+```{r visualize theme, include = F}
 ### ggplot2 theme
 myTheme <- function(base_family = "OpenSans-CondensedLight", title_family = "OpenSans-CondensedBold") {
   swi_theme(base_size = 14, base_family = base_family, title_family = title_family, y_gridlines = F) +
@@ -110,21 +128,22 @@ myTheme <- function(base_family = "OpenSans-CondensedLight", title_family = "Ope
     )   
 }
 
-ggplot(data = data, aes(x = country, y = prop, group = country, fill = country)) + 
-  geom_bar(stat = "identity") + facet_wrap(~ group, ncol = 4, scales = "free_y") + 
-  myTheme() + 
-  scale_fill_manual(values = swi_rpal, drop=FALSE) +
-  scale_x_discrete(name = "", expand = c(0,0)) +
-  geom_hline(data = d.all, aes(yintercept = prop.all), linetype = 7, size = 0.2, alpha = 0.6) +
-  geom_text(aes(label = iso2c), vjust=1.5, color = "#f7f5ed", family =  "OpenSans-CondensedBold", size = 3)
-
+if(plotDevStaticGraphic) {
+  ggplot(data = data, aes(x = country, y = prop, group = country, fill = country)) + 
+    geom_bar(stat = "identity") + facet_wrap(~ group, ncol = 4, scales = "free_y") + 
+    myTheme() + 
+    scale_fill_manual(values = swi_rpal, drop=FALSE) +
+    scale_x_discrete(name = "", expand = c(0,0)) +
+    geom_hline(data = d.all, aes(yintercept = prop.all), linetype = 7, size = 0.2, alpha = 0.6) +
+    geom_text(aes(label = iso2c), vjust=1.5, color = "#f7f5ed", family =  "OpenSans-CondensedBold", size = 3)  
+}
 ```
 
 ## Generate each sport group as a standalone graphic
 
 (instead of faceting)
 
-```{r prod graphics, include = F}
+```{r prod graphics helpers, include = F}
 ### print interactive chart
 interactive_chart <- function(gpath, fontname = 'Open Sans Condensed') {
   ggiraph(
@@ -183,11 +202,14 @@ graphGroup <- function(dd = dd, sp = sp, gr = gr, d.all = d.all) {
   list(chart = gg, title = txt[gr, lang], subtitle = subt1, pad = txt[paste0(gr,".padding"), lang])
 }
 
-
 maxV <- data %>% group_by(group, country) %>% 
   summarise(max = max(prop, na.rm = T)) %>% ungroup() %>% 
   unlist(use.names = F) %>% max()
 
+```
+
+
+```{r prod graphics, include = F}
 
 lang <- 'EN'
 gr <- 'Team Sports'
@@ -236,47 +258,5 @@ for (lang in colnames(txt)) {
         HTML(iframeresizer)
       )), file = paste0("rio2016_barBySportAndNations_", lang, ".html"), libdir = "js"
   )
-
 }
-
-
-
-
-
-
-
-
-
-
-
-# 
-# 
-# 
-# # interactive!
-# charts <- lapply(levels(data$group), function(gr) {
-#   
-#   dd <- data %>% filter(group == gr)
-#   underlying.sports <- unlist(sports[which(sports$group == gr),'sport'], use.names = F)
-#   dd$tooltip <- paste0(
-#     "<b>", as.character(dd$country), "</b><br>",
-#     dd$prop, "%<br>",
-#         '<div><span style="font-size: 0.8em">',
-#     "(", dd$value, " / ", dd$total, ")",
-#     "</span></div>"
-#   )    
-#     
-#   chart <- ggplot(data = dd, aes(x = country, tooltip = tooltip, data_id_ = country, y = prop, group = country, fill = country)) + 
-#     geom_bar_interactive(stat = "identity")  +
-#     myTheme() + 
-#     scale_fill_manual(values = swi_rpal, drop = F) +
-#     scale_y_continuous(name = "", breaks = pretty_breaks(n = 3), limits = c(0, maxV)) + 
-#     scale_x_discrete(name = "", expand = c(0,0.1), drop=FALSE)
-#   gg <- chart +
-#     geom_hline(data = d.all %>% filter(group == gr), aes(yintercept = prop.all), linetype = 3, size = 0.8, alpha = 0.9, colour = "#ffe6ff") +
-#     geom_text(aes(label = iso2c), vjust = 1.8, color = "#f7f5ed", family =  "OpenSans-CondensedBold", size = 3) 
-#   list(chart = gg, title = gr, subtitle = paste(underlying.sports, collapse =", "))
-# })
-# 
-
-
 ```
