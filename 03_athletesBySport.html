@@ -160,6 +160,7 @@ icon.file &lt;- &quot;input/Rio 20106 summer Olympic athletes list - sportGroup2
 
 spitOutGroupSports &lt;- F
 plotDevStaticGraphic &lt;- F
+computeStats &lt;- T
 
 countries &lt;- data.frame(names = c(
   &quot;Switzerland&quot;, &quot;Brazil&quot;, &quot;United States&quot;, &quot;China&quot;, &quot;Russia&quot;, 
@@ -174,7 +175,7 @@ cat(&quot;\nTotal number of athletes: &quot; )</code></pre>
 <pre><code>## 
 ## Total number of athletes:</code></pre>
 <pre class="r"><code>cat(nrow(athletes))</code></pre>
-<pre><code>## 11389</code></pre>
+<pre><code>## 11396</code></pre>
 <pre class="r"><code>txt &lt;- read.csv(trad.file, row.names = 1, stringsAsFactors = F)
 # discard incomplete translations
 cidx &lt;- unique(which(txt ==&quot;&quot; | is.na(txt), T)[,2])
@@ -192,10 +193,105 @@ cat(&quot;\nAssuming icons are in a 'icons/' folder&quot;)</code></pre>
 <pre class="r"><code>group2icon &lt;- read_csv(icon.file)
 group2icon$icon &lt;- paste0(ifelse(is.na(group2icon$icon), &quot;&quot;, &quot;icons/&quot;), group2icon$icon)
 stopifnot(all(file.exists(group2icon$icon[group2icon$icon != 'NA'])))</code></pre>
+<pre class="r"><code>if(spitOutGroupSports) {
+  sportGroups &lt;- do.call(rbind, by(sports, sports$group, function(ddd) {
+    data.frame(group = unique(ddd$group), sports = paste0(ddd$sport, collapse = &quot;, &quot;))
+  }))
+  write.csv(sportGroups, &quot;data/sportGroupsForTranslation.csv&quot;)
+}
+
+idx &lt;- match(athletes$sport, sports$sport)
+stopifnot(!any(is.na(idx)))
+athletes$group &lt;- unlist(sports[idx, 'group'], use.names = F)
+
+dat &lt;- athletes %&gt;% group_by(group, country, iso3) %&gt;% summarise(value = length(athletes)) %&gt;% ungroup()
+dat %&lt;&gt;% group_by(country, iso3) %&gt;% mutate(total = sum(value)) %&gt;% ungroup()
+dat$prop &lt;- round((dat$value / dat$total), 3)
+
+dev100 &lt;- dat %&gt;% group_by(country) %&gt;% summarise(totest = sum(prop)) %&gt;% 
+  ungroup() %&gt;% select(totest) - 1
+stopifnot(abs(dev100) &lt; .01)
+
+data &lt;- dat %&gt;% filter(iso3 %in% countries$ioc)
+d.all &lt;- data %&gt;% group_by(group) %&gt;% 
+  summarise(prop.all = (sum(value, na.rm = T) / sum(data$value))) %&gt;% 
+  ungroup() %&gt;% arrange(desc(prop.all))
+cat(&quot;\n&quot;, &quot;Check sum overall sport proportions:&quot;, sum(d.all$prop.all))</code></pre>
+<pre><code>## 
+##  Check sum overall sport proportions: 1</code></pre>
+<pre class="r"><code>d.all$group &lt;- factor(d.all$group, levels = d.all$group)
+
+# order factors
+data$group &lt;- factor(data$group, levels = d.all$group)
+data$country &lt;- gsub(&quot;Russian Federation&quot;, &quot;Russia&quot;, data$country)
+data$country &lt;- factor(data$country, levels = as.character(countries$names))
+data$iso2c &lt;- countrycode(data$iso3, &quot;ioc&quot;, &quot;iso2c&quot;)
+
+stopifnot(all(levels(data$group) %in% group2icon$group))</code></pre>
 </div>
 <div id="generate-each-sport-group-as-a-standalone-graphic" class="section level2">
 <h2>Generate each sport group as a standalone graphic</h2>
 <p>(instead of faceting)</p>
+<pre class="r"><code>if(computeStats) {
+  
+  # Countries with at least 100 athletest at Rio
+  n100 &lt;- dat %&gt;% filter(total &gt; 100) %&gt;% select (country) %&gt;% unlist %&gt;% unique()
+  length(n100)
+  
+  # non team
+   dat %&gt;% filter(group == 'Team Sports', total &gt; 100) %&gt;% 
+    arrange(prop)
+   team.ct100 &lt;- dat %&gt;% filter(group == 'Team Sports', total &gt; 100) %&gt;% select(country) %&gt;% unlist()
+   n100[which(!n100 %in% team.ct100)]
+   
+   
+  # most combat nation
+  dat %&gt;% filter(group == 'Combat Sports', total &gt; 100) %&gt;% 
+    arrange(desc(prop))
+
+    # cycling
+  dat %&gt;% filter(group == 'Cycling', total &gt; 100) %&gt;% 
+    arrange(desc(prop))
+  dat %&gt;% filter(group == 'Cycling') %&gt;% 
+    arrange(desc(value))
+
+  cat(&quot;\n Out of all country delegations of at least 100 (&quot;, length(n100), &quot;), Switzerland has the highest proportion of cylists (15.5%)&quot;) 
+  
+  dat %&gt;% filter(group == 'Sailing', total &gt; 100) %&gt;% 
+    arrange(desc(prop)) %&gt;% head(20)
+  dat %&gt;% filter(group == 'Sailing') %&gt;% 
+    arrange(desc(value))
+  
+  
+  dat %&gt;% filter(group == 'Equestrian', total &gt; 100) %&gt;% 
+    arrange(desc(prop)) %&gt;% head(20)
+  dat %&gt;% filter(group == 'Equestrian') %&gt;% 
+    arrange(desc(value))
+  
+  
+    
+  dat %&gt;% filter(group == 'Rowing', total &gt; 100) %&gt;% 
+    arrange(desc(prop)) %&gt;% head(20)
+  dat %&gt;% filter(group == 'Rowing') %&gt;% 
+    arrange(desc(value))
+  
+}</code></pre>
+<pre><code>## 
+##  Out of all country delegations of at least 100 ( 34 ), Switzerland has the highest proportion of cylists (15.5%)</code></pre>
+<pre><code>## # A tibble: 69 x 6
+##     group        country  iso3 value total  prop
+##     &lt;chr&gt;          &lt;chr&gt; &lt;chr&gt; &lt;int&gt; &lt;int&gt; &lt;dbl&gt;
+## 1  Rowing United Kingdom   GBR    43   372 0.116
+## 2  Rowing  United States   USA    41   553 0.074
+## 3  Rowing    Netherlands   NED    36   240 0.150
+## 4  Rowing    New Zealand   NZL    36   210 0.171
+## 5  Rowing        Germany   GER    35   433 0.081
+## 6  Rowing         Canada   CAN    26   312 0.083
+## 7  Rowing         Poland   POL    26   243 0.107
+## 8  Rowing      Australia   AUS    21   417 0.050
+## 9  Rowing         France   FRA    18   398 0.045
+## 10 Rowing        Romania   ROU    18    98 0.184
+## # ... with 59 more rows</code></pre>
 </div>
 </div>
 

@@ -44,9 +44,6 @@ library(scales)
 library(swiMap)
 library(swiTheme)
 
-library(png)
-library(grid)
-
 ### Interactive 
 library(ggiraph)
 library(htmltools)
@@ -62,6 +59,7 @@ icon.file <- "input/Rio 20106 summer Olympic athletes list - sportGroup2icons.cs
 
 spitOutGroupSports <- F
 plotDevStaticGraphic <- F
+computeStats <- T
 
 countries <- data.frame(names = c(
   "Switzerland", "Brazil", "United States", "China", "Russia", 
@@ -95,7 +93,7 @@ stopifnot(all(file.exists(group2icon$icon[group2icon$icon != 'NA'])))
 
 ```
 
-```{r wrangle data, include = F}
+```{r wrangle data}
 if(spitOutGroupSports) {
   sportGroups <- do.call(rbind, by(sports, sports$group, function(ddd) {
     data.frame(group = unique(ddd$group), sports = paste0(ddd$sport, collapse = ", "))
@@ -117,8 +115,9 @@ stopifnot(abs(dev100) < .01)
 
 data <- dat %>% filter(iso3 %in% countries$ioc)
 d.all <- data %>% group_by(group) %>% 
-  summarise(prop.all = (sum(value, na.rm = T) / sum(dat$value))) %>% 
+  summarise(prop.all = (sum(value, na.rm = T) / sum(data$value))) %>% 
   ungroup() %>% arrange(desc(prop.all))
+cat("\n", "Check sum overall sport proportions:", sum(d.all$prop.all))
 d.all$group <- factor(d.all$group, levels = d.all$group)
 
 # order factors
@@ -266,7 +265,7 @@ for (lang in colnames(txt)) {
       tags$head(includeHTML("styles.html")),
       tags$body(
         h2(HTML(txt["main.title", lang])),
-        div(class = "descr", HTML(paste0(txt["descr1", lang]))),
+        div(class = "descr", HTML(paste0(txt["descr1", lang], "<br><br>", "<i>", txt["descr2", lang], "</i>"))),
         div(class = "container",
             lapply(1:length(charts), function(i) {
               div(class = "graphic", 
@@ -281,4 +280,52 @@ for (lang in colnames(txt)) {
       )), file = paste0("rio2016_barBySportAndNations_", lang, ".html"), libdir = "js"
   )
 }
+```
+
+```{r some stats}
+if(computeStats) {
+  
+  # Countries with at least 100 athletest at Rio
+  n100 <- dat %>% filter(total > 100) %>% select (country) %>% unlist %>% unique()
+  length(n100)
+  
+  # non team
+   dat %>% filter(group == 'Team Sports', total > 100) %>% 
+    arrange(prop)
+   team.ct100 <- dat %>% filter(group == 'Team Sports', total > 100) %>% select(country) %>% unlist()
+   n100[which(!n100 %in% team.ct100)]
+   
+   
+  # most combat nation
+  dat %>% filter(group == 'Combat Sports', total > 100) %>% 
+    arrange(desc(prop))
+
+    # cycling
+  dat %>% filter(group == 'Cycling', total > 100) %>% 
+    arrange(desc(prop))
+  dat %>% filter(group == 'Cycling') %>% 
+    arrange(desc(value))
+
+  cat("\n Out of all country delegations of at least 100 (", length(n100), "), Switzerland has the highest proportion of cylists (15.5%)") 
+  
+  dat %>% filter(group == 'Sailing', total > 100) %>% 
+    arrange(desc(prop)) %>% head(20)
+  dat %>% filter(group == 'Sailing') %>% 
+    arrange(desc(value))
+  
+  
+  dat %>% filter(group == 'Equestrian', total > 100) %>% 
+    arrange(desc(prop)) %>% head(20)
+  dat %>% filter(group == 'Equestrian') %>% 
+    arrange(desc(value))
+  
+  
+    
+  dat %>% filter(group == 'Rowing', total > 100) %>% 
+    arrange(desc(prop)) %>% head(20)
+  dat %>% filter(group == 'Rowing') %>% 
+    arrange(desc(value))
+  
+}
+
 ```
