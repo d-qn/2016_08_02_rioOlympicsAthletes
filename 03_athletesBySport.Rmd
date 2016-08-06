@@ -59,7 +59,7 @@ icon.file <- "input/Rio 20106 summer Olympic athletes list - sportGroup2icons.cs
 
 spitOutGroupSports <- F
 plotDevStaticGraphic <- F
-computeStats <- T
+computeStats <- F
 
 countries <- data.frame(names = c(
   "Switzerland", "Brazil", "United States", "China", "Russia", 
@@ -133,11 +133,15 @@ stopifnot(all(levels(data$group) %in% group2icon$group))
 
 ```{r visualize theme, include = F}
 ### ggplot2 theme
-myTheme <- function(base_family = "OpenSans-CondensedLight", title_family = "OpenSans-CondensedBold") {
+myTheme <- function(
+  base_family = "OpenSans-CondensedLight", 
+  title_family = "OpenSans-CondensedBold", 
+  x.label.margin = -17) {
   swi_theme(base_size = 14, base_family = base_family, title_family = title_family) +
     theme(
       strip.text.x = element_text(family = title_family, hjust = 0, vjust = 1, size = 14),
-      axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5, margin = margin(t = -17), size = 11.5),
+      axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5, 
+                                 margin = margin(t = x.label.margin), size = 11.5),
       axis.line.x = element_blank(),
       axis.ticks.x = element_blank(),
       legend.position  = "none",
@@ -191,7 +195,7 @@ graphGroup <- function(dd = dd, sp = sp, gr = gr, d.all = d.all, group2icon = gr
   ddd$tooltip <- paste0(
     "<b>", as.character(ddd$ct), "</b><br>",
     ddd$prop * 100, "%",'<div><span style="font-size: 0.8em">',
-    txt[gr, lang], "<br>(", ddd$value, " / ", ddd$total, ")",
+    gsub("'", "_", txt[gr, lang]), "<br>(", ddd$value, " / ", ddd$total, ")",
     "</span></div>"
   )    
   
@@ -206,7 +210,11 @@ graphGroup <- function(dd = dd, sp = sp, gr = gr, d.all = d.all, group2icon = gr
       fill = ct)
     ) + 
     geom_bar_interactive(stat = "identity")  +
-    myTheme() + 
+    myTheme(
+      base_family = txt['base_family', lang], 
+      title_family = txt['title_family', lang],
+      x.label.margin = as.numeric(txt['x.label.margin', lang])
+    ) + 
     scale_fill_manual(values = swi_rpal, drop = F) +
     scale_y_continuous(name = "", breaks = pretty_breaks(n = 3), limits = c(0, maxV), labels = percent) + 
     scale_x_discrete(name = "", expand = c(0,0.1), drop=FALSE)
@@ -231,10 +239,12 @@ maxV <- max(data$prop)
 
 ```{r prod graphics, include = F}
 
-lang <- 'EN'
+lang <- 'ZH'
 gr <- 'Team Sports'
 
 for (lang in colnames(txt)) {
+  cat("\n", lang)
+  
   dd <- data
   sp <- sports
   

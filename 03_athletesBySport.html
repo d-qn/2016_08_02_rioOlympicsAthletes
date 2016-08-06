@@ -160,7 +160,7 @@ icon.file &lt;- &quot;input/Rio 20106 summer Olympic athletes list - sportGroup2
 
 spitOutGroupSports &lt;- F
 plotDevStaticGraphic &lt;- F
-computeStats &lt;- T
+computeStats &lt;- F
 
 countries &lt;- data.frame(names = c(
   &quot;Switzerland&quot;, &quot;Brazil&quot;, &quot;United States&quot;, &quot;China&quot;, &quot;Russia&quot;, 
@@ -183,9 +183,9 @@ if(length(cidx &gt; 0)) {
   warning(paste(colnames(txt)[cidx], collapse = &quot;\t&quot;), &quot; languages will be discarded!&quot;, &quot;\n&quot;)
   txt &lt;- txt[,-cidx, drop = F]
 }</code></pre>
-<pre><code>## Warning: FR  DE  IT  PT  RU  ES  JA  ZH  X   X.1 X.2 X.3 languages will be discarded!</code></pre>
+<pre><code>## Warning: X   X.1 X.2 X.3 languages will be discarded!</code></pre>
 <pre class="r"><code>colnames(txt)</code></pre>
-<pre><code>## [1] &quot;EN&quot;</code></pre>
+<pre><code>## [1] &quot;EN&quot; &quot;FR&quot; &quot;DE&quot; &quot;IT&quot; &quot;PT&quot; &quot;RU&quot; &quot;ES&quot; &quot;JA&quot; &quot;ZH&quot;</code></pre>
 <pre class="r"><code># check icons are present
 cat(&quot;\nAssuming icons are in a 'icons/' folder&quot;)</code></pre>
 <pre><code>## 
@@ -276,22 +276,6 @@ stopifnot(all(levels(data$group) %in% group2icon$group))</code></pre>
     arrange(desc(value))
   
 }</code></pre>
-<pre><code>## 
-##  Out of all country delegations of at least 100 ( 34 ), Switzerland has the highest proportion of cylists (15.5%)</code></pre>
-<pre><code>## # A tibble: 69 x 6
-##     group        country  iso3 value total  prop
-##     &lt;chr&gt;          &lt;chr&gt; &lt;chr&gt; &lt;int&gt; &lt;int&gt; &lt;dbl&gt;
-## 1  Rowing United Kingdom   GBR    43   372 0.116
-## 2  Rowing  United States   USA    41   553 0.074
-## 3  Rowing    Netherlands   NED    36   240 0.150
-## 4  Rowing    New Zealand   NZL    36   210 0.171
-## 5  Rowing        Germany   GER    35   433 0.081
-## 6  Rowing         Canada   CAN    26   312 0.083
-## 7  Rowing         Poland   POL    26   243 0.107
-## 8  Rowing      Australia   AUS    21   417 0.050
-## 9  Rowing         France   FRA    18   398 0.045
-## 10 Rowing        Romania   ROU    18    98 0.184
-## # ... with 59 more rows</code></pre>
 </div>
 </div>
 
