@@ -1,0 +1,217 @@
+---
+title: "02_correlation_Rio_olympicsAthletes"
+author: "Duc-Quang Nguyen"
+date: "2 Aug 2016"
+output: html_document
+---
+
+## Related stories
+
+* http://assets.sportanddev.org.sad.vm.iway.ch/downloads/79__sport_in_developing_countries.pdf
+* http://www.livescience.com/55040-predicting-rio-olympics-medal-totals.html (strong correlation between GDP and medal wins. "[I]n a wealthy country, the population can dedicate more time to leisure activities and can afford to support a class of professional athletes — both of which lead to investments in better sports infrastructure which can deliver more effective training," the authors write.)
+* http://www.motherjones.com/media/2012/07/summer-olympics-medal-gdp-charts
+
+
+## See also
+
+* http://www.medalspercapita.com
+
+
+```{r setup, include=FALSE}
+library(readr)
+library(tidyr)
+library(dplyr)
+library(magrittr)
+library(countrycode)
+library(ggplot2)
+library(scales)
+library(swiMap)
+library(swiTheme)
+library(WDI)
+
+### Interactive 
+library(htmltools)
+library(shiny)
+library(swiRcharts)
+
+
+getWbIndicators <- F
+
+rio.file <- "input/athletes_rio2016.csv"
+wb.file <- "input/wb_indicators.csv"
+rioWb.file <- "input/rioAthletesAndWBIndicators.csv"
+
+```
+
+```{r load & get data}
+athletes <- read_csv(rio.file)
+athletes$iso2c <- countrycode(athletes$iso3, "ioc", "iso2c")
+athletes$iso3c <- countrycode(athletes$iso3, "ioc", "iso3c")
+
+dat <- athletes %>% group_by(country, iso3, iso2c, iso3c) %>% summarise(total = length(athletes)) %>% ungroup() %>% arrange(desc(total)) 
+
+
+if(getWbIndicators) {
+  getWB <- function(ind = 'NY.GDP.PCAP.PP.CD', name = "GDP") {
+    data.dl <- WDI(
+      indicator = ind,
+      start = 2000,  
+      end = 2016, 
+      extra = TRUE, 
+      cache = NULL
+    )
+    colnames(data.dl)[3] <- 'value'    
+    data.wb <- data.dl %>% 
+      select(-capital, -longitude, -latitude, -lending, -income) %>%
+      arrange(year) %>%
+      filter(!is.na(value))
+    # for each country get the latest observation
+    data.wb %<>% group_by(iso2c, country) %>% dplyr::summarise(val = last(value)) %>% ungroup()
+    colnames(data.wb)[which(colnames(data.wb)== 'val')] <- name
+    data.wb
+  }
+  
+  wb <- left_join(
+    left_join(
+      getWB('NY.GDP.MKTP.PP.CD', name = "gdp"),
+      getWB('SP.POP.TOTL', name = "pop")
+    ), 
+    getWB('NY.GDP.PCAP.PP.CD', name = "gdpPerCapita")
+  )  
+  write.csv(wb, wb.file, row.names = F)
+} else {
+  wb <- read_csv(wb.file)
+}
+
+dat <- as.data.frame(left_join(dat, wb))
+write.csv(dat, rioWb.file, row.names = F)
+
+
+dat$continent <- countrycode(dat$country, "country.name", "continent")
+
+# Explore relationships!
+ggplot(data = dat, aes(gdp, total)) + geom_point(aes(size = pop, group = country)) + geom_smooth(method = "lm", se=FALSE, color="black", formula = y ~ x)
+ggplot(data = dat, aes(log10(pop), log10(total))) + geom_point(aes(size = gdp, group = country)) + geom_smooth(method = "lm", se=FALSE, color="black", formula = y ~ x)
+ggplot(data = dat, aes(log10(gdp), log10(total))) + geom_point(aes(size = pop, group = country)) + geom_smooth(method = "lm", se=FALSE, color="black", formula = y ~ x)
+ggplot(data = dat, aes(log10(gdpPerCapita), log10(total))) + geom_point(aes(size = pop, group = country)) + geom_smooth(method = "lm", se=FALSE, color="black", formula = y ~ x)
+
+ggplot(data = dat) + geom_point(aes(log10(gdp), log10(total), size = pop, group = country)) + swi_theme() + geom_smooth(method = "lm", se=FALSE, color="black", formula = log10(y) ~ log10(x))
+
+cor.test(dat$gdp, dat$total)
+cor.test(log10(dat$gdp), dat$total)
+cor.test(log10(dat$gdp), log10(dat$total))
+cor.test(log10(dat$gdpPerCapita), log10(dat$total))
+
+
+# express the GDP in trillions 
+dat$gdp <- dat$gdp / 10^6
+# compute regression
+ol.lm <- lm(log10(total) ~ log10(gdp), data=dat)
+coeffs <- coefficients(ol.lm)
+
+x.reg <- seq(from = min(dat$gdp, na.rm = T), to = max(dat$gdp, na.rm = T), length.out = 5)
+y.reg <- predict(ol.lm, newdata = list(gdp = x.reg), interval = "none")
+reg <- data.frame(x = x.reg, y = 10 ^ y.reg, color ="black", name = "regression line")
+
+
+```
+
+
+```{r interactive scatter}
+library(highcharter)
+library("viridisLite")
+
+colors <- c("Americas", "Europe", "Oceania", "Asia", "Africa")
+names(colors) <- c("#666633", "#333366", "#ac7f3e", "#ab3d3f", "#663333")
+
+lang <- 'EN'
+
+# remove NA gdp rows
+dat <- dat[which(!is.na(dat$gdp)),]
+dat[which(is.na(countryTranslation(dat$iso2c, lang)[,2])),]
+
+ # dat$tooltip <- paste0(
+ #    '<table cellpadding="1" style="line-height:1.2">',
+ #    '<tr><td><strong>', countryTranslation(dat$iso2c, lang)[,2],'</strong></td></tr>',
+ #    '<tr><td>', txt["di.tp",lang], ': ', 
+ #    dd$Score, '</td></tr>',
+ #    '<tr><td>', txt["fo.tp",lang], ": ", dd$rating, '</td></tr>',
+ #    '<tr><td>', txt["pl.tp",lang], ": ", round(dd$nPlayers / 10^3), '</td></tr>',
+ #    '<tr><td>', txt["gd.tp",lang], ": ", round(dd$gdp), '</td></tr>',
+ #    '</table>')
+ 
+ 
+ 
+hSeries <- hSeries2(
+  data.frame(
+    x = dat$gdp,
+    y = dat$total,
+    z = dat$pop,
+    color = names(colors)[match(dat$continent, colors)],
+    name = as.character(dat$country),
+    series = dat$iso2c
+  ), 
+  "series")
+
+bc <- highchart(height = 580) %>%
+  hc_chart(type = "bubble", spacing = c(13, 2, 2, 0)) %>%
+  hc_add_series_list(hSeries) %>% 
+  hc_tooltip(
+    formatter = JS("function() { return this.point.name;}"), 
+    useHTML = TRUE,
+    borderWidth = 1
+  ) %>%
+  hc_plotOptions(bubble = list(maxSize = "12%", minSize = 8)) %>%
+  hc_legend(enabled = F) %>% hc_add_theme(hc_theme_swi)
+                                          
+bc %<>%
+  hc_xAxis(
+    type = "logarithmic",  
+    floor = 2.6, 
+    maxPadding = 0.06, 
+    labels = list(formatter = JS("function() {return this.value;}")),
+    opposite = ifelse(lang == "AR", TRUE, FALSE)
+  ) %>%
+  hc_yAxis(
+    type = "logarithmic", 
+    floor = 0, 
+    maxPadding = 0.08,
+    labels = list(formatter = JS("function() {return this.value;}")),
+    reversed = ifelse(lang == "AR", TRUE, FALSE)
+  )
+# add regression line
+fc <- bc %>%  hc_add_series_df(
+  name = "Regression", 
+  type = "line",
+  dashStyle = "ShortDash",
+  lineWidth = 1,
+  enableMouseTracking = F,
+  marker = list(enabled = FALSE),
+  data = reg
+) %>% hc_plotOptions(
+  bubble = list(
+    dataLabels = list(
+      enabled = T, 
+      format = '{series.name}', 
+      style = list(
+        textShadow = F,
+        fontSize = "0.7em",
+        fontWeight = "normal"
+      )
+    )))
+  
+
+  save_html(
+    tags$html(
+      tags$head(includeHTML(style_swi_highcharter())),
+      tags$body(    
+        div(class="graphic", fc),
+        div(id = "cite", HTML("afasdfdasf")),
+        HTML(iframeresizer)
+      )
+    ), file = paste0("rioAthletesVsGDP_", lang, ".html"), libdir = "js", background = "#f2f2f2"
+  )     
+
+
+
+```
